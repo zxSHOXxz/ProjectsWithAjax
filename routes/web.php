@@ -21,3 +21,4 @@ Route::resource('project', ProjectController::class);
 Route::resource('activity', ActivityController::class);
 Route::get('/getSubActivity/{id}', [SubActivityController::class, 'getSubActivity']);
 Route::get('/getActivity', [ActivityController::class, 'getActivity']);
+Route::get('/getProjects', [ProjectController::class, 'getProjects']);

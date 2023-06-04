@@ -24,7 +24,7 @@
             <h5 class="mb-0">قائمة المشاريع</h5>
             <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#ProjectsModal"> اضافة مشروع جديد </button>
         </div>
-        <table class="table datatable-basic">
+        <table class="table datatable-basic ProjectsTable">
             <thead>
                 <tr>
                     <th>#</th>
@@ -203,7 +203,7 @@
                 <div class="modal-body">
                     <div class="card">
                         <div class="card-header">
-                            <h6 class="mb-0"> اضافة نشاط </h6>
+                            <h6 class="mb-0"> انشاء نشاط </h6>
                         </div>
                         <div class="card-body">
                             <form action="#" id="create_form">
@@ -254,7 +254,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel"> عرض الانشطو الفرعية </h5>
+                    <h5 class="modal-title" id="exampleModalLabel"> عرض الانشطة الفرعية </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -398,10 +398,12 @@
     <script>
         function performStoreProject() {
             let formData = new FormData();
-            formData.append('title', document.getElementById('title').value);
-            formData.append('end', document.getElementById('end').value);
-            formData.append('start', document.getElementById('start').value);
+            formData.append('title', document.getElementById('titleProject').value);
+            formData.append('end', document.getElementById('endProject').value);
+            formData.append('start', document.getElementById('startProject').value);
             store('/project', formData);
+            getProjects();
+            getProjectsForSelect();
         }
 
         function performStoreActivity() {
@@ -453,7 +455,7 @@
                     dropdownDiv.append(dropdownToggle);
 
                     var dropdownMenu = $('<div>').addClass('dropdown-menu dropdown-menu-end');
-                    var editLink = $('<a>').attr('href', '{{ route('project.edit', $project->id) }}')
+                    var editLink = $('<a>').attr('href', '{{ route('project.edit', 'item.id') }}')
                         .addClass('dropdown-item');
                     editLink.append($('<i>').addClass('ph-file-doc me-2'));
                     editLink.append('تعديل');
@@ -471,7 +473,6 @@
                     tableBody.append(row);
                 });
             });
-
         }
 
         function getActivity() {
@@ -495,7 +496,7 @@
                     dropdownDiv.append(dropdownToggle);
 
                     var dropdownMenu = $('<div>').addClass('dropdown-menu dropdown-menu-end');
-                    var editLink = $('<a>').attr('href', '{{ route('project.edit', $project->id) }}')
+                    var editLink = $('<a>').attr('href', `/project/edit/${item.id}`)
                         .addClass('dropdown-item');
                     editLink.append($('<i>').addClass('ph-file-doc me-2'));
                     editLink.append('تعديل');
@@ -513,7 +514,59 @@
                     tableBody.append(row);
                 });
             });
+        }
 
+        function getProjects() {
+            $.get('/getProjects', function(data) {
+                var tableBody = $('.ProjectsTable tbody');
+                console.log(data);
+                tableBody.empty();
+
+                data.forEach(function(item) {
+                    var row = $('<tr>');
+                    row.append($('<td>').text(item.id));
+                    row.append($('<td>').text(item.title));
+                    row.append($('<td>').text(item.start));
+                    row.append($('<td>').text(item.end));
+
+                    var dropdownContainer = $('<div>').addClass('d-inline-flex');
+                    var dropdownDiv = $('<div>').addClass('dropdown');
+                    var dropdownToggle = $('<a>').attr('href', '#').addClass('div-body');
+                    dropdownToggle.attr('data-bs-toggle', 'dropdown');
+                    dropdownToggle.append($('<i>').addClass('ph-list'));
+                    dropdownDiv.append(dropdownToggle);
+
+                    var dropdownMenu = $('<div>').addClass('dropdown-menu dropdown-menu-end');
+                    var editLink = $('<a>').attr('href', `/project/edit/${item.id}`)
+                        .addClass('dropdown-item');
+                    editLink.append($('<i>').addClass('ph-file-doc me-2'));
+                    editLink.append('تعديل');
+                    dropdownMenu.append(editLink);
+
+                    var deleteLink = $('<a>').attr('href', '#').addClass('dropdown-item');
+                    deleteLink.attr('onclick', 'performDestroy(' + item.id + ', this)');
+                    deleteLink.append($('<i>').addClass('ph-file-doc me-2'));
+                    deleteLink.append('حذف');
+                    dropdownMenu.append(deleteLink);
+
+                    dropdownDiv.append(dropdownMenu);
+                    dropdownContainer.append(dropdownDiv);
+                    row.append($('<td>').append(dropdownContainer));
+                    tableBody.append(row);
+                });
+            });
+        }
+
+        function getProjectsForSelect() {
+            $.get('/getProjects', function(data) {
+                var selectElement = $('#project_id');
+                selectElement.empty();
+
+                data.forEach(function(item) {
+                    var option = $('<option>').attr('value', item.id).text(item.title);
+                    selectElement.append(option);
+                });
+            });
         }
     </script>
 @endsection

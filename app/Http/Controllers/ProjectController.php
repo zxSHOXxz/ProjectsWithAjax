@@ -22,6 +22,12 @@ class ProjectController extends Controller
         return view('cms.projects.index', compact('projects', 'activities'));
     }
 
+    public function getProjects()
+    {
+        $projects = Project::all();
+        return response()->json($projects);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
