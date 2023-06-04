@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="19.349" height="19.325" viewBox="0 0 19.349 19.325">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Mask" d="M.218.024A.2.2,0,0,0,0,.242V14.276a.217.217,0,0,0,.218.217H14.512l4.837,4.831V.217A.2.2,0,0,0,19.131,0H.242Z" transform="translate(0 0)" fill="#0096d1"/>
+    </clipPath>
+  </defs>
+  <g id="icons_dark_comment-square" data-name="icons/dark/comment-square" clip-path="url(#clip-path)">
+    <g id="Color" transform="translate(-1.673 -1.157)">
+      <rect id="color_main" data-name="color/main" width="22.027" height="22" rx="4" fill="#0096d1"/>
+    </g>
+  </g>
+</svg>
