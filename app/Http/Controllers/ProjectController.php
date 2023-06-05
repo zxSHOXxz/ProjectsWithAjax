@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use App\Models\Project;
+use App\Models\SubActivity;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -108,9 +109,40 @@ class ProjectController extends Controller
      * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Project $project)
+    public function update(Request $request, $id)
     {
-        //
+        $validator = validator($request->all(), [
+            'titleProjectUpdate' => 'required|string|min:3|max:20',
+        ], [
+            'titleProjectUpdate.required' => 'العنوان مطلوب',
+            'titleProjectUpdate.min' => 'لا يقبل أقل من 3 حروف',
+            'titleProjectUpdate.max' => 'لا يقبل أكثر من 20 حروف',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            if (!$validator->fails()) {
+                $project = Project::findOrFail($id);
+                $project->title = $request->get('titleProjectUpdate');
+                $project->end = $request->get('startProjectUpdate');
+                $project->start = $request->get('endProjectUpdate');
+                $isSaved = $project->save();
+
+                if ($isSaved) {
+                    DB::commit();
+                    return response()->json(['icon' => 'success', 'title' => "تم التعديل بنجاح"], 200);
+                } else {
+                    DB::rollBack();
+                    return response()->json(['icon' => 'error', 'title' => "فشلت عملية التعديل"], 400);
+                }
+            } else {
+                return response()->json(['icon' => 'error', 'title' => $validator->getMessageBag()->first()], 400);
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['icon' => 'error', 'title' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -119,8 +151,17 @@ class ProjectController extends Controller
      * @param  \App\Models\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Project $project)
+    public function destroy($id)
     {
-        //
+        $activities = Activity::where('project_id', $id)->get();
+        foreach ($activities as $activity) {
+            $subActivities = SubActivity::where('activity_id', $activity->id)->get();
+            foreach ($subActivities as $subActivity) {
+                $subActivity->destroy($subActivity->id);
+            }
+            $activity->destroy($activity->id);
+        }
+        $project = Project::destroy($id);
+        return response()->json(['icon' => 'success', 'title' => 'Deleted is Successfully'], $project ? 200 : 400);
     }
 }

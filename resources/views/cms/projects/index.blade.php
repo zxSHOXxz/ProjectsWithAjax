@@ -29,8 +29,8 @@
                 <tr>
                     <th>#</th>
                     <th>الاسم</th>
-                    <th>الانتهاء</th>
                     <th>البدء</th>
+                    <th>الانتهاء</th>
                     <th class="div-center">الاجراءات</th>
                 </tr>
             </thead>
@@ -49,11 +49,14 @@
                                     </a>
 
                                     <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="{{ route('project.edit', $project->id) }}" class="dropdown-item">
+                                        <button data-id="{{ $project->id }}" data-title="{{ $project->title }}"
+                                            data-start="{{ $project->start }}" data-end="{{ $project->end }}"
+                                            data-bs-toggle="modal" onclick="modalUpdataProject(this)"
+                                            data-bs-target="#EditProject" id="editProjectBtn" class="dropdown-item">
                                             <i class="ph-file-doc me-2"></i>
                                             تعديل
-                                        </a>
-                                        <a href="#" onclick="performDestroy({{ $project->id }},this)"
+                                        </button>
+                                        <a href="#" onclick="performDestroyProject({{ $project->id }},this)"
                                             class="dropdown-item">
                                             <i class="ph-file-doc me-2"></i>
                                             حذف
@@ -116,11 +119,6 @@
                                                 <input class="form-control" type="date" id="endProject" name="end">
                                             </div>
                                         </div>
-                                        <div class="d-flex justify-content-end align-items-center">
-                                            <button type="button" onclick="performStoreProject()"
-                                                class="btn btn-primary ms-3">
-                                                اضافة المشروع فقط <i class="ph-paper-plane-tilt ms-2"></i></button>
-                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -140,47 +138,12 @@
                                             <th>الاسم</th>
                                             <th>الانتهاء</th>
                                             <th>البدء</th>
-                                            {{-- <th>الانشطة الفرعية</th> --}}
+                                            <th>الانشطة الفرعية</th>
                                             <th class="div-center">الاجراءات</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {{-- @foreach ($activities as $activity)
-                                            <tr>
-                                                <td>{{ $activity->id }}</td>
-                                                <td>{{ $activity->title }}</td>
-                                                <td>{{ $activity->start }}</td>
-                                                <td>{{ $activity->end }}</td>
-                                                <td>
-                                                    <button onclick="getSubActivity({{ $activity->id }})"
-                                                        data-bs-toggle="modal" data-bs-target="#getSubActivity"
-                                                        class="btn btn-indigo"> الانشطة الفرعية </button>
-                                                </td>
-                                                <td class="div-center">
-                                                    <div class="d-inline-flex">
-                                                        <div class="dropdown">
-                                                            <a href="#" class="div-body" data-bs-toggle="dropdown">
-                                                                <i class="ph-list"></i>
-                                                            </a>
 
-                                                            <div class="dropdown-menu dropdown-menu-end">
-                                                                <a href="{{ route('activity.edit', $activity->id) }}"
-                                                                    class="dropdown-item">
-                                                                    <i class="ph-file-doc me-2"></i>
-                                                                    تعديل
-                                                                </a>
-                                                                <a href="#"
-                                                                    onclick="performDestroy({{ $activity->id }},this)"
-                                                                    class="dropdown-item">
-                                                                    <i class="ph-file-doc me-2"></i>
-                                                                    حذف
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach --}}
                                     </tbody>
                                 </table>
                             </div>
@@ -224,22 +187,10 @@
                                         <input class="form-control" type="date" id="endActivity" name="end">
                                     </div>
                                 </div>
-                                <div class="mb-3 row">
-                                    <label class="col-form-label col-lg-3">المشروع</label>
-                                    <div class="col-lg-9">
-                                        <select data-placeholder="المشروع" name="project_id" id="project_id"
-                                            class="form-control select-icons">
-                                            @foreach ($projects as $project)
-                                                <option value="{{ $project->id }}">{{ $project->title }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-end align-items-center">
-                                    <button data-bs-dismiss="modal" class="btn btn-light">الغاء</button>
 
+                                <div class="d-flex justify-content-end align-items-center">
                                     <button type="button" onclick="performStoreActivity()" class="btn btn-primary ms-3">
-                                        اضافة <i class="ph-paper-plane-tilt ms-2"></i></button>
+                                        حفظ <i class="ph-paper-plane-tilt ms-2"></i></button>
                                 </div>
                             </form>
                         </div>
@@ -250,11 +201,17 @@
     </div>
 
     <!-- Modal -->
+
     <div class="modal fade" id="getSubActivity" tabindex="-1" aria-labelledby="getSubActivity" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel"> عرض الانشطة الفرعية </h5>
+                <div class="modal-header gap-5">
+                    <h5 class="modal-title" id="exampleModalLabel"> عرض الانشطة الفرعية
+                    </h5>
+                    <button class="btn btn-dark" id="addSubActivity" data-bs-toggle="modal"
+                        data-bs-target="#createSubActivity"> اضافة
+                        نشاط فرعي جديد
+                    </button>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -276,8 +233,106 @@
             </div>
         </div>
     </div>
-@endsection
 
+    {{-- create SuB Activity --}}
+
+    <div class="modal modal-xl fade" id="createSubActivity" tabindex="-1" aria-labelledby="createSubActivityLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createSubActivityLabel"> انشاء نشاط فرعي </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0"> انشاء نشاط فرعي </h6>
+                        </div>
+                        <div class="card-body">
+                            <form action="#" id="create_form">
+                                <div class="mb-3">
+                                    <label class="form-label">عنوان النشاط الفرعي</label>
+                                    <input type="text" name="titleSubActivity" id="titleSubActivity"
+                                        class="form-control" placeholder="عنوان النشاط الفرعي">
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-lg-3">تاريخ البدء</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="date" id="startSubActivity"
+                                            name="startSubActivity">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-lg-3">تاريخ الانتهاء</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="date" id="endSubActivity"
+                                            name="endSubActivity">
+                                    </div>
+                                </div>
+                                <input class="form-control" type="text" id="activity_id" name="activity_id" hidden>
+
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <button type="button" onclick="performStoreSubActivity()"
+                                        class="btn btn-primary ms-3">
+                                        حفظ <i class="ph-paper-plane-tilt ms-2"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal modal-xl fade" id="EditProject" tabindex="-1" aria-labelledby="EditProjectLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createSubActivityLabel"> تعديل المشروع </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0"> تعديل المشروع </h6>
+                        </div>
+                        <div class="card-body">
+                            <form action="#" id="create_form">
+                                <div class="mb-3">
+                                    <label class="form-label"> عنوان المشروع </label>
+                                    <input type="text" name="titleProjectUpdate" id="titleProjectUpdate"
+                                        class="form-control" placeholder="عنوان المشروع">
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-lg-3">تاريخ البدء</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="date" id="startProjectUpdate"
+                                            name="startProjectUpdate">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-lg-3">تاريخ الانتهاء</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="date" id="endProjectUpdate"
+                                            name="endProjectUpdate">
+                                    </div>
+                                </div>
+                                <input class="form-control" type="text" id="Edit_project_id" name="Edit_project_id"
+                                    hidden>
+
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <button type="button" onclick="preformUpdateProject()" class="btn btn-primary ms-3">
+                                        حفظ <i class="ph-paper-plane-tilt ms-2"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
 
 
 
@@ -285,22 +340,20 @@
 
 @section('scripts')
     <script>
-        function performDestroy(id, referance) {
-            let url = '/cms/admin/project/' + id;
+        function performDestroyProject(id, referance) {
+            let url = '/project/' + id;
             confirmDestroy(url, referance);
         }
-        /* ------------------------------------------------------------------------------
-         *
-         *  # Basic datatables
-         *
-         *  Demo JS code for datatable_basic.html page
-         *
-         * ---------------------------------------------------------------------------- */
 
+        function performDestroyActivity(id, referance) {
+            let url = '/activity/' + id;
+            confirmDestroy(url, referance);
+        }
 
-        // Setup module
-        // ------------------------------
-
+        function performDestroysub_Activity(id, referance) {
+            let url = '/sub_activity/' + id;
+            confirmDestroy(url, referance);
+        }
         const DatatableBasic = function() {
 
 
@@ -384,11 +437,6 @@
                 }
             }
         }();
-
-
-        // Initialize module
-        // ------------------------------
-
         document.addEventListener('DOMContentLoaded', function() {
             DatatableBasic.init();
         });
@@ -396,56 +444,46 @@
     <script src="{{ asset('cms/assets/js/vendor/forms/selects/select2.min.js') }}"></script>
     <script src="{{ asset('cms/assets/demo/pages/form_select2.js') }}"></script>
     <script>
-        function performStoreProject() {
-            let formData = new FormData();
-            formData.append('title', document.getElementById('titleProject').value);
-            formData.append('end', document.getElementById('endProject').value);
-            formData.append('start', document.getElementById('startProject').value);
-            store('/project', formData);
-            getProjects();
-            getProjectsForSelect();
-        }
-
         function performStoreActivity() {
             let formData = new FormData();
 
-            function checkFormData() {
-                var formProject = document.querySelector('.formProject');
-                var inputs = formProject.querySelectorAll('input');
-
-                for (var i = 0; i < inputs.length; i++) {
-                    if (inputs[i].value !== "") {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
-            var hasFormData = checkFormData();
-            if (hasFormData) {
-                formData.append('titleProject', document.getElementById('titleProject').value);
-                formData.append('endProject', document.getElementById('endProject').value);
-                formData.append('startProject', document.getElementById('startProject').value);
-            }
+            formData.append('titleProject', document.getElementById('titleProject').value);
+            formData.append('endProject', document.getElementById('endProject').value);
+            formData.append('startProject', document.getElementById('startProject').value);
             formData.append('titleActivity', document.getElementById('titleActivity').value);
             formData.append('endActivity', document.getElementById('endActivity').value);
             formData.append('startActivity', document.getElementById('startActivity').value);
-            formData.append('project_id', document.getElementById('project_id').value);
             store('/activity', formData);
+            getProjects();
+            getActivity();
+        }
+
+        function preformUpdateProject() {
+            let formData = new FormData();
+
+            formData.append('titleProjectUpdate', document.getElementById('titleProjectUpdate').value);
+            formData.append('startProjectUpdate', document.getElementById('startProjectUpdate').value);
+            formData.append('endProjectUpdate', document.getElementById('endProjectUpdate').value);
+            id = document.getElementById('Edit_project_id').value;
+            // console.log(document.getElementById('Edit_project_id').value);
+            storeRoute('/project_update/' + id, formData);
+            getProjects();
         }
 
         function getSubActivity(id) {
             $.get('/getSubActivity/' + id, function(data) {
                 var tableBody = $('.subActivityTable tbody');
+                var addSubActivity = $('#addSubActivity');
+                addSubActivity.attr('data-id', id);
+
                 tableBody.empty();
 
                 data.forEach(function(item) {
                     var row = $('<tr>');
                     row.append($('<td>').text(item.id));
                     row.append($('<td>').text(item.title));
-                    row.append($('<td>').text(item.start));
-                    row.append($('<td>').text(item.end));
+                    row.append($('<td>').addClass('text-nowrap').text(item.start));
+                    row.append($('<td>').addClass('text-nowrap').text(item.end));
 
                     var dropdownContainer = $('<div>').addClass('d-inline-flex');
                     var dropdownDiv = $('<div>').addClass('dropdown');
@@ -462,7 +500,7 @@
                     dropdownMenu.append(editLink);
 
                     var deleteLink = $('<a>').attr('href', '#').addClass('dropdown-item');
-                    deleteLink.attr('onclick', 'performDestroy(' + item.id + ', this)');
+                    deleteLink.attr('onclick', 'performDestroysub_Activity(' + item.id + ', this)');
                     deleteLink.append($('<i>').addClass('ph-file-doc me-2'));
                     deleteLink.append('حذف');
                     dropdownMenu.append(deleteLink);
@@ -485,8 +523,16 @@
                     var row = $('<tr>');
                     row.append($('<td>').text(item.id));
                     row.append($('<td>').text(item.title));
-                    row.append($('<td>').text(item.start));
-                    row.append($('<td>').text(item.end));
+                    row.append($('<td>').addClass('text-nowrap').text(item.start));
+                    row.append($('<td>').addClass('text-nowrap').text(item.end));
+                    row.append($('<td>').append(
+                        $('<button>')
+                        .text('الانشطة الفرعية')
+                        .addClass('btn btn-indigo')
+                        .attr('onclick', `getSubActivity(${item.id})`)
+                        .attr('data-bs-toggle', 'modal')
+                        .attr('data-bs-target', '#getSubActivity')
+                    ));
 
                     var dropdownContainer = $('<div>').addClass('d-inline-flex');
                     var dropdownDiv = $('<div>').addClass('dropdown');
@@ -496,14 +542,14 @@
                     dropdownDiv.append(dropdownToggle);
 
                     var dropdownMenu = $('<div>').addClass('dropdown-menu dropdown-menu-end');
-                    var editLink = $('<a>').attr('href', `/project/edit/${item.id}`)
+                    var editLink = $('<a>').attr('href', "{{ route('activity.edit', '') }}/" + item.id)
                         .addClass('dropdown-item');
                     editLink.append($('<i>').addClass('ph-file-doc me-2'));
                     editLink.append('تعديل');
                     dropdownMenu.append(editLink);
 
                     var deleteLink = $('<a>').attr('href', '#').addClass('dropdown-item');
-                    deleteLink.attr('onclick', 'performDestroy(' + item.id + ', this)');
+                    deleteLink.attr('onclick', 'performDestroyActivity(' + item.id + ', this)');
                     deleteLink.append($('<i>').addClass('ph-file-doc me-2'));
                     deleteLink.append('حذف');
                     dropdownMenu.append(deleteLink);
@@ -526,8 +572,8 @@
                     var row = $('<tr>');
                     row.append($('<td>').text(item.id));
                     row.append($('<td>').text(item.title));
-                    row.append($('<td>').text(item.start));
-                    row.append($('<td>').text(item.end));
+                    row.append($('<td>').addClass('text-nowrap').text(item.start));
+                    row.append($('<td>').addClass('text-nowrap').text(item.end));
 
                     var dropdownContainer = $('<div>').addClass('d-inline-flex');
                     var dropdownDiv = $('<div>').addClass('dropdown');
@@ -557,16 +603,35 @@
             });
         }
 
-        function getProjectsForSelect() {
-            $.get('/getProjects', function(data) {
-                var selectElement = $('#project_id');
-                selectElement.empty();
+        let prof = document.getElementById('profile-tab')
+        prof.addEventListener('click', _ => {
+            getActivity();
+        })
 
-                data.forEach(function(item) {
-                    var option = $('<option>').attr('value', item.id).text(item.title);
-                    selectElement.append(option);
-                });
-            });
+        var addSubActivityBtn = document.getElementById('addSubActivity');
+        addSubActivityBtn.addEventListener('click', _ => {
+            var dataId = addSubActivityBtn.dataset.id;
+            var activity_id_input = document.getElementById('activity_id');
+            activity_id_input.value = dataId;
+        });
+
+        function modalUpdataProject(referance) {
+            var dataId = referance.dataset.id;
+            var Edit_project_id = document.getElementById('Edit_project_id');
+            Edit_project_id.value = dataId;
+            document.getElementById('titleProjectUpdate').value = referance.dataset.title;
+            document.getElementById('startProjectUpdate').value = referance.dataset.start;
+            document.getElementById('endProjectUpdate').value = referance.dataset.end;
+        }
+
+        function performStoreSubActivity() {
+            let formData = new FormData();
+
+            formData.append('titleSubActivity', document.getElementById('titleSubActivity').value);
+            formData.append('startSubActivity', document.getElementById('startSubActivity').value);
+            formData.append('endSubActivity', document.getElementById('endSubActivity').value);
+            formData.append('activity_id', document.getElementById('activity_id').value);
+            store('/sub_activity', formData);
         }
     </script>
 @endsection

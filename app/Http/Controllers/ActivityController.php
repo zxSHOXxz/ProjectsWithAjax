@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use App\Models\Project;
+use App\Models\SubActivity;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -44,45 +45,50 @@ class ActivityController extends Controller
     {
         $validator = validator($request->all(), [
             'titleActivity' => 'required|string|min:3|max:20',
+            'titleProject' => 'required|string|min:3|max:20',
+            'endActivity' => 'required',
+            'startActivity' => 'required',
+            'endProject' => 'required',
+            'startProject' => 'required',
         ], [
-            'titleActivity.required' => 'العنوان مطلوب',
-            'titleActivity.min' => 'لا يقبل أقل من 3 حروف',
-            'titleActivity.max' => 'لا يقبل أكثر من 20 حروف',
+            'titleActivity.required' => 'العنوان النشاط مطلوب',
+            'titleActivity.min' => 'لا يقبل عنوان النشاط أقل من 3 حروف',
+            'titleActivity.max' => 'لا يقبل عنوان النشاط أكثر من 20 حروف',
+            'titleProject.required' => 'العنوان  عنوان المشروع مطلوب',
+            'titleProject.min' => 'لا يقبل عنوان المشروع أقل من 3 حروف',
+            'titleProject.max' => 'لا يقبل عنوان المشروع أكثر من 20 حروف',
+            'endActivity.required' => 'تاريخ انتهاء النشاط مطلوب',
+            'startActivity.required' => 'تاريخ بدءالنشاط مطلوب',
+            'endProject.required' => 'تاريخ انتهاء المشروع مطلوب',
+            'startProject.required' => 'تاريخ بدء المشروع مطلوب',
         ]);
 
-        DB::beginTransaction();
-
         if (!$validator->fails()) {
+            DB::beginTransaction();
+
             try {
+                $project = new Project();
+                $project->title = $request->get('titleProject');
+                $project->end = $request->get('endProject');
+                $project->start = $request->get('startProject');
+                $isProjectSaved = $project->save();
+
                 $activity = new Activity();
                 $activity->title = $request->get('titleActivity');
                 $activity->end = $request->get('endActivity');
                 $activity->start = $request->get('startActivity');
-                $activity->project_id = $request->get('project_id');
-                $isSaved = $activity->save();
-                if ($request->has('titleProject')) {
-                    $project = new Project();
-                    $project->title = $request->get('titleProject');
-                    $project->end = $request->get('endProject');
-                    $project->start = $request->get('startProject');
-                    $isSaved = $project->save();
-                    if ($isSaved) {
-                        DB::commit();
-                        return response()->json(['icon' => 'success', 'title' => "تمت الإضافة بنجاح"], 200);
-                    } else {
-                        DB::rollBack();
-                        return response()->json(['icon' => 'error', 'title' => "فشلت عملية التخزين"], 400);
-                    }
-                }
-                if ($isSaved) {
+                $activity->project_id = $project->id;
+                $isActivitySaved = $activity->save();
+
+                if ($isProjectSaved && $isActivitySaved) {
                     DB::commit();
                     return response()->json(['icon' => 'success', 'title' => "تمت الإضافة بنجاح"], 200);
                 } else {
-                    DB::rollBack();
+                    DB::rollback();
                     return response()->json(['icon' => 'error', 'title' => "فشلت عملية التخزين"], 400);
                 }
             } catch (Exception $e) {
-                DB::rollBack();
+                DB::rollback();
                 return response()->json(['icon' => 'error', 'title' => $e->getMessage()], 500);
             }
         } else {
@@ -130,8 +136,13 @@ class ActivityController extends Controller
      * @param  \App\Models\Activity  $activity
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Activity $activity)
+    public function destroy($id)
     {
-        //
+        $subActivities = SubActivity::where('activity_id', $id)->get();
+        foreach ($subActivities as $subActivity) {
+            $subActivity->destroy($subActivity->id);
+        }
+        $activity = Activity::destroy($id);
+        return response()->json(['icon' => 'success', 'title' => 'Deleted is Successfully'], $activity ? 200 : 400);
     }
 }

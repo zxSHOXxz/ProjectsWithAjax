@@ -44,11 +44,11 @@ class SubActivityController extends Controller
     public function store(Request $request)
     {
         $validator = validator($request->all(), [
-            'title' => 'required|string|min:3|max:20',
+            'titleSubActivity' => 'required|string|min:3|max:20',
         ], [
-            'title.required' => 'العنوان مطلوب',
-            'title.min' => 'لا يقبل أقل من 3 حروف',
-            'title.max' => 'لا يقبل أكثر من 20 حروف',
+            'titleSubActivity.required' => 'العنوان مطلوب',
+            'titleSubActivity.min' => 'لا يقبل أقل من 3 حروف',
+            'titleSubActivity.max' => 'لا يقبل أكثر من 20 حروف',
         ]);
 
         DB::beginTransaction();
@@ -56,10 +56,10 @@ class SubActivityController extends Controller
         if (!$validator->fails()) {
             try {
                 $subActivity = new SubActivity();
-                $subActivity->title = $request->get('titleActivity');
-                $subActivity->end = $request->get('endActivity');
-                $subActivity->start = $request->get('startActivity');
-                $subActivity->activity_id = $request->get('project_id');
+                $subActivity->title = $request->get('titleSubActivity');
+                $subActivity->end = $request->get('startSubActivity');
+                $subActivity->start = $request->get('endSubActivity');
+                $subActivity->activity_id = $request->get('activity_id');
                 $isSaved = $subActivity->save();
                 if ($isSaved) {
                     DB::commit();
@@ -117,8 +117,9 @@ class SubActivityController extends Controller
      * @param  \App\Models\SubActivity  $subActivity
      * @return \Illuminate\Http\Response
      */
-    public function destroy(SubActivity $subActivity)
+    public function destroy($id)
     {
-        //
+        $SubActivity = SubActivity::destroy($id);
+        return response()->json(['icon' => 'success', 'title' => 'Deleted is Successfully'], $SubActivity ? 200 : 400);
     }
 }

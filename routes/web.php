@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::resource('project', ProjectController::class);
 Route::resource('activity', ActivityController::class);
+Route::resource('sub_activity', SubActivityController::class);
 Route::get('/getSubActivity/{id}', [SubActivityController::class, 'getSubActivity']);
 Route::get('/getActivity', [ActivityController::class, 'getActivity']);
 Route::get('/getProjects', [ProjectController::class, 'getProjects']);
+Route::post('/project_update/{id}', [ProjectController::class, 'update']);

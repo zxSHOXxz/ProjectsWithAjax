@@ -16,11 +16,6 @@ function store(url, data) {
 }
 
 
-    let prof = document.getElementById('profile-tab')
-    prof.addEventListener('click', _=>{
-        getActivity();
-    })
-
 function storepart(url, data) {
     axios
         .post(url, data)
@@ -47,10 +42,10 @@ function storeRoute(url, data) {
             },
         })
         .then(function (response) {
-            window.location = response.data.redirect;
-            // showMessage(response.data);
-            // clearForm();
-            // clearAndHideErrors();
+            // window.location = response.data.redirect;
+            showMessage(response.data);
+            clearForm();
+            clearAndHideErrors();
         })
         .catch(function (error) {
             if (error.response.data.errors !== undefined) {
