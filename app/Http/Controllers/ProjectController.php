@@ -46,85 +46,120 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        $mainActivity = $request->input('mainActivity');
+        $mainActivityA = $request->input('mainActivity');
         $subActivity = $request->input('subActivity');
-        $validator = validator($request->all(), [
-            'mainActivity' => 'required',
-            'subActivity' => 'required',
-        ], [
-            'mainActivity.required' => ' النشاط الرئيسي مطلوب',
-            'subActivity.required' => ' النشاط الفرعي مطلوب',
 
+        $mainActivity = json_encode($mainActivityA);
+        $subActivity = json_encode($subActivity);
+
+        $validator = validator([
+            'titleMainProject' => $request->input('titleMainProject'),
+            'startMainProject' => $request->input('startMainProject'),
+            'endMainProject' => $request->input('endMainProject'),
+            'mainActivity' => $mainActivity,
+            'subActivity' => $subActivity,
+        ], [
+            'titleMainProject' => 'required',
+            'startMainProject' => 'required|date',
+            'endMainProject' => 'required|date|after:startMainProject',
+            'mainActivity.*.title' => 'required',
+            'mainActivity.*.startDate' => 'required|date',
+            'mainActivity.*.endDate' => 'required|date|after:mainActivity.*.startDate',
+            'subActivity.*.parentTitle' => 'required',
+            'subActivity.*.subActivityTitle' => 'required',
+            'subActivity.*.subActivityStartDate' => 'required|date',
+            'subActivity.*.subActivityEndDate' => 'required|date|after:subActivity.*.subActivityStartDate',
+        ], [
+            'titleMainProject.required' => 'عنوان المشروع الرئيسي مطلوب',
+            'startMainProject.required' => 'تاريخ البدء في المشروع الرئيسي مطلوب',
+            'startMainProject.date' => 'تاريخ البدء في المشروع الرئيسي يجب أن يكون تاريخ صالح',
+            'endMainProject.required' => 'تاريخ الانتهاء في المشروع الرئيسي مطلوب',
+            'endMainProject.date' => 'تاريخ الانتهاء في المشروع الرئيسي يجب أن يكون تاريخ صالح',
+            'endMainProject.after' => 'تاريخ الانتهاء في المشروع الرئيسي يجب أن يكون بعد تاريخ البدء',
+            'mainActivity.required' => 'الأنشطة الرئيسية مطلوبة',
+            'mainActivity.*.title.required' => 'عنوان النشاط الرئيسي مطلوب',
+            'mainActivity.*.startDate.required' => 'تاريخ البدء في النشاط الرئيسي مطلوب',
+            'mainActivity.*.startDate.date' => 'تاريخ البدء في النشاط الرئيسي يجب أن يكون تاريخ صالح',
+            'mainActivity.*.endDate.required' => 'تاريخ الانتهاء في النشاط الرئيسي مطلوب',
+            'mainActivity.*.endDate.date' => 'تاريخ الانتهاء في النشاط الرئيسي يجب أن يكون تاريخ صالح',
+            'mainActivity.*.endDate.after' => 'تاريخ الانتهاء في النشاط الرئيسي يجب أن يكون بعد تاريخ البدء',
+            'subActivity.required' => 'الأنشطة الفرعية مطلوبة',
+            'subActivity.*.parentTitle.required' => 'عنوان النشاط الرئيسي للنشاط الفرعي مطلوب',
+            'subActivity.*.subActivityTitle.required' => 'عنوان النشاط الفرعي مطلوب',
+            'subActivity.*.subActivityStartDate.required' => 'تاريخ البدء في النشاط الفرعي مطلوب',
+            'subActivity.*.subActivityStartDate.date' => 'تاريخ البدء في النشاط الفرعي يجب أن يكون تاريخ صالح',
+            'subActivity.*.subActivityEndDate.required' => 'تاريخ الانتهاء في النشاط الفرعي مطلوب',
+            'subActivity.*.subActivityEndDate.date' => 'تاريخ الانتهاء في النشاط الفرعي يجب أن يكون تاريخ صالح',
+            'subActivity.*.subActivityEndDate.after' => 'تاريخ الانتهاء في النشاط الفرعي يجب أن يكون بعد تاريخ البدء',
         ]);
+
+
+        if ($validator->fails()) {
+            return response()->json(['icon' => 'error', 'title' => $validator->getMessageBag()->first()], 400);
+        }
 
         DB::beginTransaction();
 
         try {
-            if (!$validator->fails()) {
-                $project = new Project();
-                $project->title = $request->get('titleMainProject');
-                $project->start = $request->get('startMainProject');
-                $project->end = $request->get('endMainProject');
-                if (strtotime($project->start) >= strtotime($project->end)) {
-                    return response()->json(['icon' => 'error', 'title' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء في المشروع الرئيسي'], 400);
-                }
-                $isSaved = $project->save();
-                foreach ($mainActivity as $activity) {
-                    $activityData = json_decode($activity, true);
+            $project = new Project();
+            $project->title = $request->get('titleMainProject');
+            $project->start = $request->get('startMainProject');
+            $project->end = $request->get('endMainProject');
 
-                    $activityTitle = $activityData['title'];
-                    $activityStartDate = $activityData['startDate'];
-                    $activityEndDate = $activityData['endDate'];
-
-                    $mainActivity = new Activity();
-                    $mainActivity->title = $activityTitle;
-                    $mainActivity->start = $activityStartDate;
-                    $mainActivity->end = $activityEndDate;
-                    if (strtotime($mainActivity->start) >= strtotime($mainActivity->end)) {
-                        return response()->json(['icon' => 'error', 'title' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء في النشاط الرئيسي'], 400);
-                    }
-                    $mainActivity->project_id = $project->id;
-
-                    $mainActivity->save();
-
-                    $subActivities = $request->input('subActivity');
-
-                    foreach ($subActivities as $subActivity) {
-                        $subActivityData = json_decode($subActivity, true);
-
-                        $subActivityParentTitle = $subActivityData['parentTitle'];
-                        $subActivityTitle = $subActivityData['subActivityTitle'];
-                        $subActivityStartDate = $subActivityData['subActivityStartDate'];
-                        $subActivityEndDate = $subActivityData['subActivityEndDate'];
-
-                        if ($subActivityParentTitle === $mainActivity->title) {
-                            $subActivity = new SubActivity();
-                            $subActivity->title = $subActivityTitle;
-                            $subActivity->start = $subActivityStartDate;
-                            $subActivity->end = $subActivityEndDate;
-                            $subActivity->activity_id = $mainActivity->id;
-                            if (strtotime($subActivity->start) >= strtotime($subActivity->end)) {
-                                return response()->json(['icon' => 'error', 'title' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء في النشاط الفرعي'], 400);
-                            }
-                            $subActivity->save();
-                        }
-                    }
-                }
-                if ($isSaved) {
-                    DB::commit();
-                    return response()->json(['icon' => 'success', 'title' => "تمت الإضافة بنجاح"], 200);
-                } else {
-                    DB::rollBack();
-                    return response()->json(['icon' => 'error', 'title' => "فشلت عملية التخزين"], 400);
-                }
-            } else {
-                return response()->json(['icon' => 'error', 'title' => $validator->getMessageBag()->first()], 400);
+            if (!$project->save()) {
+                DB::rollBack();
+                return response()->json(['icon' => 'error', 'title' => 'حدث خطأ أثناء حفظ المشروع الرئيسي'], 400);
             }
+
+            foreach ($mainActivityA as $activity) {
+                $activityData = json_decode($activity, true);
+
+                $activityTitle = $activityData['title'];
+                $activityStartDate = $activityData['startDate'];
+                $activityEndDate = $activityData['endDate'];
+
+                $mainActivity = new Activity();
+                $mainActivity->title = $activityTitle;
+                $mainActivity->start = $activityStartDate;
+                $mainActivity->end = $activityEndDate;
+                $mainActivity->project_id = $project->id;
+
+                if (!$mainActivity->save()) {
+                    DB::rollBack();
+                    return response()->json(['icon' => 'error', 'title' => 'حدث خطأ أثناء حفظ النشاط الرئيسي'], 400);
+                }
+
+                $subActivities = $request->input('subActivity');
+
+                foreach ($subActivities as $subActivity) {
+                    $subActivityData = json_decode($subActivity, true);
+
+                    $parentTitle = $subActivityData['parentTitle'];
+                    $subActivityTitle = $subActivityData['subActivityTitle'];
+                    $subActivityStartDate = $subActivityData['subActivityStartDate'];
+                    $subActivityEndDate = $subActivityData['subActivityEndDate'];
+
+                    $subActivity = new Activity();
+                    $subActivity->title = $subActivityTitle;
+                    $subActivity->start = $subActivityStartDate;
+                    $subActivity->end = $subActivityEndDate;
+                    $subActivity->project_id = $project->id;
+
+                    if (!$subActivity->save()) {
+                        DB::rollBack();
+                        return response()->json(['icon' => 'error', 'title' => 'حدث خطأ أثناء حفظ النشاط الفرعي'], 400);
+                    }
+                }
+            }
+
+            DB::commit();
+            return response()->json(['icon' => 'success', 'title' => "تمت الإضافة بنجاح"], 200);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['icon' => 'error', 'title' => $e->getMessage()], 500);
         }
     }
+
 
     /**
      * Display the specified resource.
