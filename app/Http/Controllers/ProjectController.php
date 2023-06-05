@@ -46,12 +46,15 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        $mainActivity = $request->input('mainActivity');
+        $subActivity = $request->input('subActivity');
         $validator = validator($request->all(), [
-            'title' => 'required|string|min:3|max:20',
+            'mainActivity' => 'required',
+            'subActivity' => 'required',
         ], [
-            'title.required' => 'العنوان مطلوب',
-            'title.min' => 'لا يقبل أقل من 3 حروف',
-            'title.max' => 'لا يقبل أكثر من 20 حروف',
+            'mainActivity.required' => 'العنوان مطلوب',
+            'subActivity.required' => 'العنوان مطلوب',
+
         ]);
 
         DB::beginTransaction();
@@ -59,11 +62,54 @@ class ProjectController extends Controller
         try {
             if (!$validator->fails()) {
                 $project = new Project();
-                $project->title = $request->get('title');
-                $project->end = $request->get('end');
-                $project->start = $request->get('start');
+                $project->title = $request->get('titleMainProject');
+                $project->start = $request->get('startMainProject');
+                $project->end = $request->get('endMainProject');
+                if (strtotime($project->start) >= strtotime($project->end)) {
+                    return response()->json(['icon' => 'error', 'title' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء في المشروع الرئيسي'], 400);
+                }
                 $isSaved = $project->save();
+                foreach ($mainActivity as $activity) {
+                    $activityData = json_decode($activity, true);
 
+                    $activityTitle = $activityData['title'];
+                    $activityStartDate = $activityData['startDate'];
+                    $activityEndDate = $activityData['endDate'];
+
+                    $mainActivity = new Activity();
+                    $mainActivity->title = $activityTitle;
+                    $mainActivity->start = $activityStartDate;
+                    $mainActivity->end = $activityEndDate;
+                    if (strtotime($mainActivity->start) >= strtotime($mainActivity->end)) {
+                        return response()->json(['icon' => 'error', 'title' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء في النشاط الرئيسي'], 400);
+                    }
+                    $mainActivity->project_id = $project->id;
+
+                    $mainActivity->save();
+
+                    $subActivities = $request->input('subActivity');
+
+                    foreach ($subActivities as $subActivity) {
+                        $subActivityData = json_decode($subActivity, true);
+
+                        $subActivityParentTitle = $subActivityData['parentTitle'];
+                        $subActivityTitle = $subActivityData['subActivityTitle'];
+                        $subActivityStartDate = $subActivityData['subActivityStartDate'];
+                        $subActivityEndDate = $subActivityData['subActivityEndDate'];
+
+                        if ($subActivityParentTitle === $mainActivity->title) {
+                            $subActivity = new SubActivity();
+                            $subActivity->title = $subActivityTitle;
+                            $subActivity->start = $subActivityStartDate;
+                            $subActivity->end = $subActivityEndDate;
+                            $subActivity->activity_id = $mainActivity->id;
+                            if (strtotime($subActivity->start) >= strtotime($subActivity->end)) {
+                                return response()->json(['icon' => 'error', 'title' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء في النشاط الرئيسي'], 400);
+                            }
+                            $subActivity->save();
+                        }
+                    }
+                }
                 if ($isSaved) {
                     DB::commit();
                     return response()->json(['icon' => 'success', 'title' => "تمت الإضافة بنجاح"], 200);

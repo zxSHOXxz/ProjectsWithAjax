@@ -15,7 +15,6 @@ function store(url, data) {
         });
 }
 
-
 function storepart(url, data) {
     axios
         .post(url, data)
