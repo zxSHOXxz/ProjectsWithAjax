@@ -602,6 +602,7 @@
             getProjects();
             getActivity();
         }
+
         function preformUpdateProject() {
             let formData = new FormData();
             formData.append('titleProjectUpdate', document.getElementById('titleProjectUpdate').value);
@@ -820,9 +821,9 @@
         function performStoreSubActivity() {
             let formData = new FormData();
 
-            formData.append('titleSubActivity', document.getElementById('titleSub_ActivitytUpdate').value);
-            formData.append('startSubActivity', document.getElementById('startSub_ActivitytUpdate').value);
-            formData.append('endSubActivity', document.getElementById('endSub_ActivitytUpdate').value);
+            formData.append('titleSubActivity', document.getElementById('titleSubActivity').value);
+            formData.append('startSubActivity', document.getElementById('startSubActivity').value);
+            formData.append('endSubActivity', document.getElementById('endSubActivity').value);
             formData.append('activity_id', document.getElementById('activity_id').value);
             store('/sub_activity', formData);
         }
