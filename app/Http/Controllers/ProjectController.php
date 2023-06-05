@@ -104,7 +104,7 @@ class ProjectController extends Controller
                             $subActivity->end = $subActivityEndDate;
                             $subActivity->activity_id = $mainActivity->id;
                             if (strtotime($subActivity->start) >= strtotime($subActivity->end)) {
-                                return response()->json(['icon' => 'error', 'title' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء في النشاط الرئيسي'], 400);
+                                return response()->json(['icon' => 'error', 'title' => 'تاريخ البدء يجب أن يكون قبل تاريخ الانتهاء في النشاط الفرعي'], 400);
                             }
                             $subActivity->save();
                         }
