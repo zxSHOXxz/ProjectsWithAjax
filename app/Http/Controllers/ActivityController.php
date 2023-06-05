@@ -125,9 +125,40 @@ class ActivityController extends Controller
      * @param  \App\Models\Activity  $activity
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Activity $activity)
+    public function update(Request $request, $id)
     {
-        //
+        $validator = validator($request->all(), [
+            'titleActivitytUpdate' => 'required|string|min:3|max:20',
+        ], [
+            'titleActivitytUpdate.required' => 'العنوان مطلوب',
+            'titleActivitytUpdate.min' => 'لا يقبل أقل من 3 حروف',
+            'titleActivitytUpdate.max' => 'لا يقبل أكثر من 20 حروف',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            if (!$validator->fails()) {
+                $activity = Activity::findOrFail($id);
+                $activity->title = $request->get('titleActivitytUpdate');
+                $activity->end = $request->get('startActivitytUpdate');
+                $activity->start = $request->get('endActivitytUpdate');
+                $isSaved = $activity->save();
+
+                if ($isSaved) {
+                    DB::commit();
+                    return response()->json(['icon' => 'success', 'title' => "تم التعديل بنجاح"], 200);
+                } else {
+                    DB::rollBack();
+                    return response()->json(['icon' => 'error', 'title' => "فشلت عملية التعديل"], 400);
+                }
+            } else {
+                return response()->json(['icon' => 'error', 'title' => $validator->getMessageBag()->first()], 400);
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['icon' => 'error', 'title' => $e->getMessage()], 500);
+        }
     }
 
     /**

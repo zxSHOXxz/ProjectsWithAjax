@@ -24,3 +24,5 @@ Route::get('/getSubActivity/{id}', [SubActivityController::class, 'getSubActivit
 Route::get('/getActivity', [ActivityController::class, 'getActivity']);
 Route::get('/getProjects', [ProjectController::class, 'getProjects']);
 Route::post('/project_update/{id}', [ProjectController::class, 'update']);
+Route::post('/activity_update/{id}', [ActivityController::class, 'update']);
+Route::post('/sub_activity_update/{id}', [SubActivityController::class, 'update']);
