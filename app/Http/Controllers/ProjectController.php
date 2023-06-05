@@ -52,8 +52,8 @@ class ProjectController extends Controller
             'mainActivity' => 'required',
             'subActivity' => 'required',
         ], [
-            'mainActivity.required' => 'العنوان مطلوب',
-            'subActivity.required' => 'العنوان مطلوب',
+            'mainActivity.required' => ' النشاط الرئيسي مطلوب',
+            'subActivity.required' => ' النشاط الفرعي مطلوب',
 
         ]);
 
