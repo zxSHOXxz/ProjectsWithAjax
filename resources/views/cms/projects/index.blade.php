@@ -72,6 +72,7 @@
     </div>
     <!-- /basic datatable -->
 
+    {{-- create Project Modal --}}
     <div class="modal modal-xl fade" id="ProjectsModal" tabindex="-1" aria-labelledby="CreatProjectLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -119,6 +120,11 @@
                                                 <input class="form-control" type="date" id="endProject" name="end">
                                             </div>
                                         </div>
+                                        <div class="d-flex justify-content-end align-items-center">
+                                            <button type="button" onclick="performStoreActivity()"
+                                                class="btn btn-primary ms-3">
+                                                حفظ <i class="ph-paper-plane-tilt ms-2"></i></button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -153,17 +159,19 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal -->
+    {{-- create Activity Modal --}}
     <div class="modal modal-xl fade" id="createActivity" tabindex="-1" aria-labelledby="createActivityLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header gap-5">
                     <h5 class="modal-title" id="createActivityLabel"> انشاء نشاط </h5>
+                    <button type="button" id="addButtonActivity" class="btn btn-dark my-3">
+                        <i class="fas fa-plus"></i> إضافة
+                    </button>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" id="cardActivityContainer">
                     <div class="card">
                         <div class="card-header">
                             <h6 class="mb-0"> انشاء نشاط </h6>
@@ -172,36 +180,35 @@
                             <form action="#" id="create_form">
                                 <div class="mb-3">
                                     <label class="form-label">عنوان النشاط</label>
-                                    <input type="text" name="title" id="titleActivity" class="form-control"
+                                    <input type="text" name="titleActivity" id="titleActivity" class="form-control"
                                         placeholder="عنوان النشاط">
                                 </div>
                                 <div class="row mb-3">
                                     <label class="col-form-label col-lg-3">تاريخ البدء</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="date" id="startActivity" name="start">
+                                        <input class="form-control" type="date" id="startActivity"
+                                            name="endActivity">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label class="col-form-label col-lg-3">تاريخ الانتهاء</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="date" id="endActivity" name="end">
+                                        <input class="form-control" type="date" id="endActivity"
+                                            name="startActivity">
                                     </div>
-                                </div>
-
-                                <div class="d-flex justify-content-end align-items-center">
-                                    <button type="button" onclick="performStoreActivity()" class="btn btn-primary ms-3">
-                                        حفظ <i class="ph-paper-plane-tilt ms-2"></i></button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal -->
-
+    {{-- Get Sub Activity Modal --}}
     <div class="modal fade" id="getSubActivity" tabindex="-1" aria-labelledby="getSubActivity" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -233,9 +240,7 @@
             </div>
         </div>
     </div>
-
-    {{-- create SuB Activity --}}
-
+    {{-- create Sub Activity Modal --}}
     <div class="modal modal-xl fade" id="createSubActivity" tabindex="-1" aria-labelledby="createSubActivityLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -284,6 +289,7 @@
             </div>
         </div>
     </div>
+    {{-- Edit Project Modal --}}
     <div class="modal modal-xl fade" id="EditProject" tabindex="-1" aria-labelledby="EditProjectLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -332,6 +338,7 @@
             </div>
         </div>
     </div>
+    {{-- Edit Activity Modal --}}
     <div class="modal modal-xl fade" id="EditActivity" tabindex="-1" aria-labelledby="EditActivityLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -381,6 +388,7 @@
             </div>
         </div>
     </div>
+    {{-- Edit Sub Activity Modal --}}
     <div class="modal modal-xl fade" id="EditSubActivity" tabindex="-1" aria-labelledby="EditSubActivityLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -545,20 +553,33 @@
         function performStoreActivity() {
             let formData = new FormData();
 
-            formData.append('titleProject', document.getElementById('titleProject').value);
-            formData.append('endProject', document.getElementById('endProject').value);
-            formData.append('startProject', document.getElementById('startProject').value);
-            formData.append('titleActivity', document.getElementById('titleActivity').value);
-            formData.append('endActivity', document.getElementById('endActivity').value);
-            formData.append('startActivity', document.getElementById('startActivity').value);
-            store('/activity', formData);
-            getProjects();
-            getActivity();
+            let titleActivities = document.querySelectorAll('[name="titleActivity"]');
+            let endActivities = document.querySelectorAll('[name="endActivity"]');
+            let startActivities = document.querySelectorAll('[name="startActivity"]');
+
+            titleActivities.forEach(function(input) {
+                formData.append('titleActivity', input.value);
+            });
+            endActivities.forEach(function(input) {
+                formData.append('endActivity', input.value);
+            });
+            startActivities.forEach(function(input) {
+                formData.append('startActivity', input.value);
+            });
+
+            let formDataMap = new Map();
+
+            formData.forEach(function(value, key) {
+                if (!formDataMap.has(key)) {
+                    formDataMap.set(key, []);
+                }
+                formDataMap.get(key).push(value);
+            });
         }
+
 
         function preformUpdateProject() {
             let formData = new FormData();
-
             formData.append('titleProjectUpdate', document.getElementById('titleProjectUpdate').value);
             formData.append('startProjectUpdate', document.getElementById('startProjectUpdate').value);
             formData.append('endProjectUpdate', document.getElementById('endProjectUpdate').value);
@@ -581,7 +602,6 @@
 
         function preformUpdateSubActivity() {
             let formData = new FormData();
-
             formData.append('titleSub_ActivitytUpdate', document.getElementById('titleSub_ActivitytUpdate').value);
             formData.append('startSub_ActivitytUpdate', document.getElementById('startSub_ActivitytUpdate').value);
             formData.append('endSub_ActivitytUpdate', document.getElementById('endSub_ActivitytUpdate').value);
@@ -781,6 +801,81 @@
             formData.append('endSubActivity', document.getElementById('endSub_ActivitytUpdate').value);
             formData.append('activity_id', document.getElementById('activity_id').value);
             store('/sub_activity', formData);
+        }
+
+        var cardContainerActivity = document.getElementById("cardActivityContainer");
+        var addButtonActivity = document.getElementById("addButtonActivity");
+
+        var cardContainerSubActivity = document.getElementById("cardSubActivityContainer");
+        var addButtonActivity = document.getElementById("addButtonActivity");
+
+        addButtonActivity.addEventListener('click', function() {
+            createCardActivity();
+        });
+
+        var cardTemplateActivity =
+            `
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"> انشاء نشاط </h6>
+                    </div>
+                    <div class="card-body">
+                        <form action="#" id="create_form">
+                            <div class="mb-3">
+                                <label class="form-label">عنوان النشاط</label>
+                                <input type="text" name="titleActivity" id="titleActivity" class="form-control" placeholder="عنوان النشاط">
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-form-label col-lg-3">تاريخ البدء</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="date" id="startActivity" name="startActivity">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-form-label col-lg-3">تاريخ الانتهاء</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="date" id="endActivity" name="endActivity">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                `
+        var cardTemplateSubActivity =
+            `
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"> انشاء نشاط </h6>
+                    </div>
+                    <div class="card-body">
+                        <form action="#" id="create_form">
+                            <div class="mb-3">
+                                <label class="form-label">عنوان النشاط</label>
+                                <input type="text" name="titleActivity" id="titleActivity" class="form-control" placeholder="عنوان النشاط">
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-form-label col-lg-3">تاريخ البدء</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="date" id="startActivity" name="startActivity">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <label class="col-form-label col-lg-3">تاريخ الانتهاء</label>
+                                <div class="col-lg-9">
+                                    <input class="form-control" type="date" id="endActivity" name="endActivity">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                `
+
+        function createCardActivity() {
+            cardContainerActivity.innerHTML += cardTemplateActivity;
+        }
+
+        function createCardSubActivity() {
+            cardContainerSubActivity.innerHTML += cardTemplateSubActivity;
         }
     </script>
 @endsection
