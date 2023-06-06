@@ -50,7 +50,7 @@ class ProjectController extends Controller
         $subActivity = $request->input('subActivity');
 
         $mainActivity = json_encode($mainActivityA);
-        $subActivity = json_encode($subActivity);
+        $subActivity = json_encode($subActivity); 
 
         $validator = validator([
             'titleMainProject' => $request->input('titleMainProject'),

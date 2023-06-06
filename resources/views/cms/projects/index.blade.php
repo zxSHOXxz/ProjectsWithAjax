@@ -52,7 +52,7 @@
                                         <button data-id="{{ $project->id }}" data-title="{{ $project->title }}"
                                             data-start="{{ $project->start }}" data-end="{{ $project->end }}"
                                             data-bs-toggle="modal" onclick="modalUpdataProject(this)"
-                                            data-bs-target="#EditProject" id="editProjectBtn" class="dropdown-item">
+                                            data-bs-target="#UpdataProjectModal" id="editProjectBtn" class="dropdown-item">
                                             <i class="ph-file-doc me-2"></i>
                                             تعديل
                                         </button>
@@ -304,50 +304,98 @@
         </div>
     </div>
     {{-- Edit Project Modal --}}
-    <div class="modal modal-xl fade" id="EditProject" tabindex="-1" aria-labelledby="EditProjectLabel"
+
+    <!-- Modal -->
+    <div class="modal modal-xl fade" id="UpdataProjectModal" tabindex="-1" aria-labelledby="UpdataProjectModal"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createSubActivityLabel"> تعديل المشروع </h5>
+                    <h1 class="modal-title fs-5" id="UpdataProjectModal">تعديل مشروع</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0"> تعديل المشروع </h6>
-                        </div>
-                        <div class="card-body">
-                            <form action="#" id="create_form">
-                                <div class="mb-3">
-                                    <label class="form-label"> عنوان المشروع </label>
-                                    <input type="text" name="titleProjectUpdate" id="titleProjectUpdate"
-                                        class="form-control" placeholder="عنوان المشروع">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="update-project-tab" data-bs-toggle="tab"
+                                data-bs-target="#update-project-tab-pane" type="button" role="tab"
+                                aria-controls="update-project-tab-pane" aria-selected="true">تعديل المشروع</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="update-activity-tab" data-bs-toggle="tab"
+                                data-bs-target="#update-activity-tab-pane" type="button" role="tab"
+                                aria-controls="update-activity-tab-pane" aria-selected="false">تعديل انشطة
+                                المشروع</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="update-project-tab-pane" role="tabpanel"
+                            aria-labelledby="update-project-tab" tabindex="0">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0"> تعديل المشروع </h6>
                                 </div>
-                                <div class="row mb-3">
-                                    <label class="col-form-label col-lg-3">تاريخ البدء</label>
-                                    <div class="col-lg-9">
-                                        <input class="form-control" type="date" id="startProjectUpdate"
-                                            name="startProjectUpdate">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label class="col-form-label col-lg-3">تاريخ الانتهاء</label>
-                                    <div class="col-lg-9">
-                                        <input class="form-control" type="date" id="endProjectUpdate"
-                                            name="endProjectUpdate">
-                                    </div>
-                                </div>
-                                <input class="form-control" type="text" id="Edit_project_id" name="Edit_project_id"
-                                    hidden>
+                                <div class="card-body">
+                                    <form action="#" id="create_form">
+                                        <div class="mb-3">
+                                            <label class="form-label"> عنوان المشروع </label>
+                                            <input type="text" name="titleProjectUpdate" id="titleProjectUpdate"
+                                                class="form-control" placeholder="عنوان المشروع">
+                                        </div>
+                                        <div class="row mb-3">
+                                            <label class="col-form-label col-lg-3">تاريخ البدء</label>
+                                            <div class="col-lg-9">
+                                                <input class="form-control" type="date" id="startProjectUpdate"
+                                                    name="startProjectUpdate">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <label class="col-form-label col-lg-3">تاريخ الانتهاء</label>
+                                            <div class="col-lg-9">
+                                                <input class="form-control" type="date" id="endProjectUpdate"
+                                                    name="endProjectUpdate">
+                                            </div>
+                                        </div>
+                                        <input class="form-control" type="text" id="Edit_project_id"
+                                            name="Edit_project_id" hidden>
 
-                                <div class="d-flex justify-content-end align-items-center">
-                                    <button type="button" onclick="preformUpdateProject()" class="btn btn-primary ms-3">
-                                        حفظ <i class="ph-paper-plane-tilt ms-2"></i></button>
+                                        <div class="d-flex justify-content-end align-items-center">
+                                            <button type="button" onclick="preformUpdateProject()"
+                                                class="btn btn-primary ms-3">
+                                                حفظ <i class="ph-paper-plane-tilt ms-2"></i></button>
+                                        </div>
+                                    </form>
                                 </div>
-                            </form>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="update-activity-tab-pane" role="tabpanel"
+                            aria-labelledby="update-activity-tab" tabindex="0">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">قائمة الانشطة الخاصة بالمشروع</h5>
+                                    <button class="btn btn-outline-dark" data-bs-target="#createActivityInProject"
+                                        data-bs-toggle="modal"> اضافة نشاط جديد </button>
+
+                                </div>
+                                <table class="table datatable-basic ActivityTableForProject">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>الاسم</th>
+                                            <th>الانتهاء</th>
+                                            <th>البدء</th>
+                                            <th>الانشطة الفرعية</th>
+                                            <th class="div-center">الاجراءات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -448,6 +496,67 @@
                             </form>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal modal-xl fade" id="createActivityInProject" tabindex="-1"
+        aria-labelledby="createActivityInProjectLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header gap-5">
+                    <h5 class="modal-title" id="createActivityInProjectLabel"> انشاء نشاط </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="cardActivityContainer">
+                    <div class="card cardAcivity">
+                        <div class="card-header">
+                            <h6 class="mb-0"> انشاء نشاط </h6>
+                        </div>
+                        <div class="card-body">
+                            <form action="#" id="create_formForActivity" class="MainActivityInProject">
+                                <div class="mb-3">
+                                    <label class="form-label">عنوان النشاط</label>
+                                    <input type="text" name="titleActivity" id="titleActivity" class="form-control"
+                                        placeholder="عنوان النشاط">
+                                    <input type="text" name="activity_project_id" id="activity_project_id"
+                                        class="form-control" hidden>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-lg-3">تاريخ البدء</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="date" id="startActivity"
+                                            name="endActivity">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-form-label col-lg-3">تاريخ الانتهاء</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="date" id="endActivity"
+                                            name="startActivity">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <button type="button" id="addButtonSubActivity"
+                                        onclick="createCardSubActivity(this)" class="btn btn-dark my-3">
+                                        <i class="fas fa-plus"></i> ﺇضافة نشاط فرعي
+                                    </button>
+                                    <div class="container">
+                                        <div class="row" id="cardSubActivityContainer">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="performStoreActivityInProject(this)"> حفظ
+                    </button>
                 </div>
             </div>
         </div>
@@ -563,354 +672,9 @@
     </script>
     <script src="{{ asset('cms/assets/js/vendor/forms/selects/select2.min.js') }}"></script>
     <script src="{{ asset('cms/assets/demo/pages/form_select2.js') }}"></script>
-    <script>
-        function performStoreActivity() {
-            var formData = new FormData();
-
-            var mainActivities = document.querySelectorAll('#cardActivityContainer .cardAcivity');
-
-            mainActivities.forEach(function(activity) {
-                var title = activity.querySelector('#titleActivity').value;
-                var startDate = activity.querySelector('#startActivity').value;
-                var endDate = activity.querySelector('#endActivity').value;
-
-                formData.append('mainActivity[]', JSON.stringify({
-                    title: title,
-                    startDate: startDate,
-                    endDate: endDate
-                }));
-
-                var subActivities = activity.querySelectorAll('#cardSubActivityContainer .cardSubAcivity');
-
-                subActivities.forEach(function(subActivity) {
-                    var subActivityTitle = subActivity.querySelector('#titleSubActivity').value;
-                    var subActivityStartDate = subActivity.querySelector('#startSubActivity').value;
-                    var subActivityEndDate = subActivity.querySelector('#endSubActivity').value;
-
-                    formData.append('subActivity[]', JSON.stringify({
-                        parentTitle: title,
-                        subActivityTitle: subActivityTitle,
-                        subActivityStartDate: subActivityStartDate,
-                        subActivityEndDate: subActivityEndDate
-                    }));
-                });
-            });
-            formData.append('titleMainProject', document.querySelector('[name="titleMainProject"]').value);
-            formData.append('startMainProject', document.querySelector('[name="startMainProject"]').value);
-            formData.append('endMainProject', document.querySelector('[name="endMainProject"]').value);
-            store('/project', formData);
-            getProjects();
-            getActivity();
-        }
-
-        function preformUpdateProject() {
-            let formData = new FormData();
-            formData.append('titleProjectUpdate', document.getElementById('titleProjectUpdate').value);
-            formData.append('startProjectUpdate', document.getElementById('startProjectUpdate').value);
-            formData.append('endProjectUpdate', document.getElementById('endProjectUpdate').value);
-            id = document.getElementById('Edit_project_id').value;
-            // console.log(document.getElementById('Edit_project_id').value);
-            storeRoute('/project_update/' + id, formData);
-            getProjects();
-        }
-
-        function preformUpdateActivity() {
-            let formData = new FormData();
-
-            formData.append('titleActivitytUpdate', document.getElementById('titleActivitytUpdate').value);
-            formData.append('startActivitytUpdate', document.getElementById('startActivitytUpdate').value);
-            formData.append('endActivitytUpdate', document.getElementById('endActivitytUpdate').value);
-            id = document.getElementById('Edit_activity_id').value;
-            storeRoute('/activity_update/' + id, formData);
-            getActivity();
-        }
-
-        function preformUpdateSubActivity() {
-            let formData = new FormData();
-            formData.append('titleSub_ActivitytUpdate', document.getElementById('titleSub_ActivitytUpdate').value);
-            formData.append('startSub_ActivitytUpdate', document.getElementById('startSub_ActivitytUpdate').value);
-            formData.append('endSub_ActivitytUpdate', document.getElementById('endSub_ActivitytUpdate').value);
-            id = document.getElementById('Edit_sub_activity_id').value;
-            storeRoute('/sub_activity_update/' + id, formData);
-        }
-
-        function getSubActivity(id) {
-            $.get('/getSubActivity/' + id, function(data) {
-                var tableBody = $('.subActivityTable tbody');
-                var addSubActivity = $('#addSubActivity');
-                addSubActivity.attr('data-id', id);
-
-                tableBody.empty();
-
-                data.forEach(function(item) {
-                    var row = $('<tr>');
-                    row.append($('<td>').text(item.id));
-                    row.append($('<td>').text(item.title));
-                    row.append($('<td>').addClass('text-nowrap').text(item.start));
-                    row.append($('<td>').addClass('text-nowrap').text(item.end));
-
-                    var dropdownContainer = $('<div>').addClass('d-inline-flex');
-                    var dropdownDiv = $('<div>').addClass('dropdown');
-                    var dropdownToggle = $('<a>').attr('href', '#').addClass('div-body');
-                    dropdownToggle.attr('data-bs-toggle', 'dropdown');
-                    dropdownToggle.append($('<i>').addClass('ph-list'));
-                    dropdownDiv.append(dropdownToggle);
-
-                    var dropdownMenu = $('<div>').addClass('dropdown-menu dropdown-menu-end');
-                    var editLink = $('<button>').attr('onclick', 'modalUpdataSubActivity(this)')
-                        .attr('data-id', item.id)
-                        .attr('data-title', item.title)
-                        .attr('data-start', item.start)
-                        .attr('data-end', item.end)
-                        .attr('data-bs-toggle', "modal")
-                        .attr('data-bs-target', "#EditSubActivity")
-                        .addClass('dropdown-item');
-                    editLink.append($('<i>').addClass('ph-file-doc me-2'));
-                    editLink.append('تعديل');
-                    dropdownMenu.append(editLink);
-
-                    var deleteLink = $('<a>').attr('href', '#').addClass('dropdown-item');
-                    deleteLink.attr('onclick', 'performDestroysub_Activity(' + item.id + ', this)');
-                    deleteLink.append($('<i>').addClass('ph-file-doc me-2'));
-                    deleteLink.append('حذف');
-                    dropdownMenu.append(deleteLink);
-
-                    dropdownDiv.append(dropdownMenu);
-                    dropdownContainer.append(dropdownDiv);
-                    row.append($('<td>').append(dropdownContainer));
-                    tableBody.append(row);
-                });
-            });
-        }
-
-        function getActivity() {
-            $.get('/getActivity', function(data) {
-                var tableBody = $('.ActivityTable tbody');
-                console.log(data);
-                tableBody.empty();
-
-                data.forEach(function(item) {
-                    var row = $('<tr>');
-                    row.append($('<td>').text(item.id));
-                    row.append($('<td>').text(item.title));
-                    row.append($('<td>').addClass('text-nowrap').text(item.start));
-                    row.append($('<td>').addClass('text-nowrap').text(item.end));
-                    row.append($('<td>').append(
-                        $('<button>')
-                        .text('الانشطة الفرعية')
-                        .addClass('btn btn-indigo')
-                        .attr('onclick', `getSubActivity(${item.id})`)
-                        .attr('data-bs-toggle', 'modal')
-                        .attr('data-bs-target', '#getSubActivity')
-                    ));
-
-                    var dropdownContainer = $('<div>').addClass('d-inline-flex');
-                    var dropdownDiv = $('<div>').addClass('dropdown');
-                    var dropdownToggle = $('<a>').attr('href', '#').addClass('div-body');
-                    dropdownToggle.attr('data-bs-toggle', 'dropdown');
-                    dropdownToggle.append($('<i>').addClass('ph-list'));
-                    dropdownDiv.append(dropdownToggle);
-
-                    var dropdownMenu = $('<div>').addClass('dropdown-menu dropdown-menu-end');
-                    var editLink = $('<button>').attr('onclick', 'modalUpdataActivity(this)')
-                        .attr('data-id', item.id)
-                        .attr('data-title', item.title)
-                        .attr('data-start', item.start)
-                        .attr('data-end', item.end)
-                        .attr('data-bs-toggle', "modal")
-                        .attr('data-bs-target', "#EditActivity")
-                        .addClass('dropdown-item');
-                    editLink.append($('<i>').addClass('ph-file-doc me-2'));
-                    editLink.append('تعديل');
-                    dropdownMenu.append(editLink);
-
-                    var deleteLink = $('<a>').attr('href', '#').addClass('dropdown-item');
-                    deleteLink.attr('onclick', 'performDestroyActivity(' + item.id + ', this)');
-                    deleteLink.append($('<i>').addClass('ph-file-doc me-2'));
-                    deleteLink.append('حذف');
-                    dropdownMenu.append(deleteLink);
-
-                    dropdownDiv.append(dropdownMenu);
-                    dropdownContainer.append(dropdownDiv);
-                    row.append($('<td>').append(dropdownContainer));
-                    tableBody.append(row);
-                });
-            });
-        }
-
-        function getProjects() {
-            $.get('/getProjects', function(data) {
-                var tableBody = $('.ProjectsTable tbody');
-                console.log(data);
-                tableBody.empty();
-
-                data.forEach(function(item) {
-                    var row = $('<tr>');
-                    row.append($('<td>').text(item.id));
-                    row.append($('<td>').text(item.title));
-                    row.append($('<td>').addClass('text-nowrap').text(item.start));
-                    row.append($('<td>').addClass('text-nowrap').text(item.end));
-
-                    var dropdownContainer = $('<div>').addClass('d-inline-flex');
-                    var dropdownDiv = $('<div>').addClass('dropdown');
-                    var dropdownToggle = $('<a>').attr('href', '#').addClass('div-body');
-                    dropdownToggle.attr('data-bs-toggle', 'dropdown');
-                    dropdownToggle.append($('<i>').addClass('ph-list'));
-                    dropdownDiv.append(dropdownToggle);
-
-                    var dropdownMenu = $('<div>').addClass('dropdown-menu dropdown-menu-end');
-                    var editLink = $('<a>').attr('href', `/project/edit/${item.id}`)
-                        .addClass('dropdown-item');
-                    editLink.append($('<i>').addClass('ph-file-doc me-2'));
-                    editLink.append('تعديل');
-                    dropdownMenu.append(editLink);
-
-                    var deleteLink = $('<a>').attr('href', '#').addClass('dropdown-item');
-                    deleteLink.attr('onclick', 'performDestroy(' + item.id + ', this)');
-                    deleteLink.append($('<i>').addClass('ph-file-doc me-2'));
-                    deleteLink.append('حذف');
-                    dropdownMenu.append(deleteLink);
-
-                    dropdownDiv.append(dropdownMenu);
-                    dropdownContainer.append(dropdownDiv);
-                    row.append($('<td>').append(dropdownContainer));
-                    tableBody.append(row);
-                });
-            });
-        }
-
-        let prof = document.getElementById('profile-tab')
-        prof.addEventListener('click', _ => {
-            getActivity();
-        })
-
-        var addSubActivityBtn = document.getElementById('addSubActivity');
-        addSubActivityBtn.addEventListener('click', _ => {
-            var dataId = addSubActivityBtn.dataset.id;
-            var activity_id_input = document.getElementById('activity_id');
-            activity_id_input.value = dataId;
-        });
-
-        function modalUpdataProject(referance) {
-            var dataId = referance.dataset.id;
-            var Edit_project_id = document.getElementById('Edit_project_id');
-            Edit_project_id.value = dataId;
-            document.getElementById('titleProjectUpdate').value = referance.dataset.title;
-            document.getElementById('startProjectUpdate').value = referance.dataset.start;
-            document.getElementById('endProjectUpdate').value = referance.dataset.end;
-        }
-
-        function modalUpdataActivity(referance) {
-            var dataId = referance.dataset.id;
-            var Edit_activity_id = document.getElementById('Edit_activity_id');
-            Edit_activity_id.value = dataId;
-            document.getElementById('titleActivitytUpdate').value = referance.dataset.title;
-            document.getElementById('startActivitytUpdate').value = referance.dataset.start;
-            document.getElementById('endActivitytUpdate').value = referance.dataset.end;
-        }
-
-        function modalUpdataSubActivity(referance) {
-            var dataId = referance.dataset.id;
-            var Edit_sub_activity_id = document.getElementById('Edit_sub_activity_id');
-            Edit_sub_activity_id.value = dataId;
-            document.getElementById('titleSub_ActivitytUpdate').value = referance.dataset.title;
-            document.getElementById('startSub_ActivitytUpdate').value = referance.dataset.start;
-            document.getElementById('endSub_ActivitytUpdate').value = referance.dataset.end;
-        }
-
-        function performStoreSubActivity() {
-            let formData = new FormData();
-
-            formData.append('titleSubActivity', document.getElementById('titleSubActivity').value);
-            formData.append('startSubActivity', document.getElementById('startSubActivity').value);
-            formData.append('endSubActivity', document.getElementById('endSubActivity').value);
-            formData.append('activity_id', document.getElementById('activity_id').value);
-            store('/sub_activity', formData);
-        }
-
-        var addButtonActivity = document.getElementById("addButtonActivity");
-
-        addButtonActivity.addEventListener('click', function() {
-            createCardActivity();
-        });
-
-        var cardTemplateActivity =
-            `
-                <div class="card cardAcivity">
-                    <div class="card-header">
-                        <h6 class="mb-0"> انشاء نشاط </h6>
-                    </div>
-                    <div class="card-body">
-                        <form action="#" id="create_form">
-                            <div class="mb-3">
-                                <label class="form-label">عنوان النشاط</label>
-                                <input type="text" name="titleActivity" id="titleActivity" class="form-control" placeholder="عنوان النشاط">
-                            </div>
-                            <div class="row mb-3">
-                                <label class="col-form-label col-lg-3">تاريخ البدء</label>
-                                <div class="col-lg-9">
-                                    <input class="form-control" type="date" id="startActivity" name="startActivity">
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label class="col-form-label col-lg-3">تاريخ الانتهاء</label>
-                                <div class="col-lg-9">
-                                    <input class="form-control" type="date" id="endActivity" name="endActivity">
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                    <button type="button" id="addButtonSubActivity" onclick="createCardSubActivity(this)" class="btn btn-dark my-3">
-                                        <i class="fas fa-plus"></i> ﺇضافة نشاط فرعي
-                                    </button>
-                                    <div class="container">
-                                        <div class="row" id="cardSubActivityContainer">
-
-                                        </div>
-                                    </div>
-                                </div>
-                        </form>
-                    </div>
-                </div>
-                `
-        var cardTemplateSubActivity =
-            `
-            <div class="col-6">
-                <div class="card cardSubAcivity">
-                    <div class="card-header">
-                        <h6 class="mb-0"> انشاء نشاط فرعي </h6>
-                    </div>
-                    <div class="card-body">
-                        <form action="#" id="create_form">
-                            <div class="mb-3">
-                                <label class="form-label">عنوان النشاط</label>
-                                <input type="text" name="titleSubActivity" id="titleSubActivity" class="form-control" placeholder="عنوان النشاط">
-                            </div>
-                            <div class="row mb-3">
-                                <label class="col-form-label col-lg-3">تاريخ البدء</label>
-                                <div class="col-lg-9">
-                                    <input class="form-control" type="date" id="startSubActivity" name="startSubActivity">
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <label class="col-form-label col-lg-3">تاريخ الانتهاء</label>
-                                <div class="col-lg-9">
-                                    <input class="form-control" type="date" id="endSubActivity" name="endSubActivity">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-                `
-
-        function createCardActivity() {
-            var cardContainerActivity = document.getElementById("cardActivityContainer");
-            cardContainerActivity.innerHTML += cardTemplateActivity;
-        }
-
-        function createCardSubActivity(referance) {
-            var container = referance.nextElementSibling.querySelector('#cardSubActivityContainer');
-            container.innerHTML += cardTemplateSubActivity;
-        }
-    </script>
+    <script src="{{ asset('cms/assets/js/taskJs/getData.js') }}"></script>
+    <script src="{{ asset('cms/assets/js/taskJs/storeData.js') }}"></script>
+    <script src="{{ asset('cms/assets/js/taskJs/update,js') }}"></script>
+    <script src="{{ asset('cms/assets/js/taskJs/inners.js') }}"></script>
+    <script src="{{ asset('cms/assets/js/taskJs/events.js') }}"></script>
 @endsection

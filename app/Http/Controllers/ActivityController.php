@@ -8,6 +8,7 @@ use App\Models\SubActivity;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ActivityController extends Controller
 {
@@ -23,6 +24,11 @@ class ActivityController extends Controller
     public function getActivity()
     {
         $activity = Activity::all();
+        return response()->json($activity);
+    }
+    public function getActivityForProject($id)
+    {
+        $activity = Activity::where('project_id', $id)->get();
         return response()->json($activity);
     }
     /**
@@ -93,6 +99,94 @@ class ActivityController extends Controller
             }
         } else {
             return response()->json(['icon' => 'error', 'title' => $validator->getMessageBag()->first()], 400);
+        }
+    }
+    public function projectActivityStore(Request $request)
+    {
+
+        $data = $request->get('subActivities');
+        $request_activity = $request->get('mainActivity');
+
+        $main_activityData = explode(',', $request_activity[0]);
+        $main_activity_title = $main_activityData[0];
+        $main_activity_startDate = $main_activityData[1];
+        $main_activity_project_id = $main_activityData[2];
+        $main_activity_endDate = $main_activityData[3];
+
+        $main_activity = [
+            'title' => $main_activity_title,
+            'start_date' => $main_activity_startDate,
+            'end_date' => $main_activity_endDate,
+            'project_id' => $main_activity_project_id
+        ];
+
+        $subActivities = [];
+
+        foreach ($data as $activityItem) {
+            $activityData = explode(',', $activityItem);
+            $title = $activityData[0];
+            $startDate = $activityData[1];
+            $endDate = $activityData[2];
+
+            $activity = [
+                'title' => $title,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+            ];
+
+            $subActivities[] = $activity;
+        }
+
+        $validator = validator(
+            [
+                'mainActivity' => $main_activity,
+                'subActivity' => $subActivities,
+            ],
+            [
+                'mainActivity' => 'required|array',
+                'mainActivity.title' => 'required|string',
+                'mainActivity.start_date' => 'required|date',
+                'mainActivity.end_date' => 'required|date|after:mainActivity.start_date',
+                'subActivity' => 'required|array',
+                'subActivity.*.title' => 'required|string',
+                'subActivity.*.start_date' => 'required|date',
+                'subActivity.*.end_date' => 'required|date|after:subActivity.*.start_date',
+            ],
+            []
+        );
+
+        if ($validator->fails()) {
+            return response()->json(['icon' => 'error', 'title' => $validator->getMessageBag()->first()], 400);
+        }
+        DB::beginTransaction();
+
+        try {
+            $activity = new Activity();
+            $activity->title = $main_activity['title'];
+            $activity->end = $main_activity['start_date'];
+            $activity->start = $main_activity['end_date'];
+            $activity->project_id = $main_activity['project_id'];
+            $isActivitySaved = $activity->save();
+
+            foreach ($subActivities as $subActivity) {
+                $sub_activity = new SubActivity();
+                $sub_activity->title = $subActivity['title'];
+                $sub_activity->start = $subActivity['start_date'];
+                $sub_activity->end = $subActivity['end_date'];
+                $sub_activity->activity_id = $activity->id;
+                $isSubActivitySaved = $sub_activity->save();
+            }
+
+            if ($isActivitySaved && $isSubActivitySaved) {
+                DB::commit();
+                return response()->json(['icon' => 'success', 'title' => "تمت الإضافة بنجاح"], 200);
+            } else {
+                DB::rollback();
+                return response()->json(['icon' => 'error', 'title' => "فشلت عملية التخزين"], 400);
+            }
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json(['icon' => 'error', 'title' => $e->getMessage()], 500);
         }
     }
 
