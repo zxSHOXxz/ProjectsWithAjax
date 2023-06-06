@@ -22,6 +22,12 @@ class ProjectController extends Controller
         $activities = Activity::all();
         return view('cms.projects.index', compact('projects', 'activities'));
     }
+    public function indexClender()
+    {
+        $projects = Project::all();
+        $activities = Activity::all();
+        return view('cms.clender.index', compact('projects', 'activities'));
+    }
 
     public function getProjects()
     {
@@ -50,7 +56,7 @@ class ProjectController extends Controller
         $subActivity = $request->input('subActivity');
 
         $mainActivity = json_encode($mainActivityA);
-        $subActivity = json_encode($subActivity); 
+        $subActivity = json_encode($subActivity);
 
         $validator = validator([
             'titleMainProject' => $request->input('titleMainProject'),
