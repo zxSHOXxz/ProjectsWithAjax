@@ -23,6 +23,7 @@ Route::resource('sub_activity', SubActivityController::class);
 Route::get('/getSubActivity/{id}', [SubActivityController::class, 'getSubActivity']);
 Route::get('/getActivity', [ActivityController::class, 'getActivity']);
 Route::get('/', [ProjectController::class, 'indexClender'])->name('indexClender');
+Route::get('/getClender/{id}', [ProjectController::class, 'getClender'])->name('getClender');
 Route::get('/getActivityForProject/{id}', [ActivityController::class, 'getActivityForProject']);
 Route::get('/getProjects', [ProjectController::class, 'getProjects']);
 Route::post('/project_update/{id}', [ProjectController::class, 'update']);

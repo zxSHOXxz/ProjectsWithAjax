@@ -24,12 +24,6 @@
     </style>
 @endsection
 
-
-@php
-    $project = $projects->where('id', 10)->first();
-    $activitiesT = App\Models\Activity::where('project_id', $project->id)->get();
-@endphp
-
 @section('content')
     <div class="row">
         <form>
@@ -68,7 +62,7 @@
         </form>
     </div>
     <div id="table-container">
-        <table id="table">
+        {{-- <table id="table">
             <thead id="tableThead">
                 <tr id="monthsTr">
                     <th colspan="15"> </th>
@@ -94,7 +88,7 @@
                     @endforeach
                 @endforeach
             </tbody>
-        </table>
+        </table> --}}
     </div>
 @endsection
 
@@ -123,7 +117,8 @@
             var project_id = document.querySelector("#project_id").value
             var tableStart_date = document.querySelector("#start_date").value
             var tableEnd_date = document.querySelector("#end_date").value
+            getClender(project_id);
         }
-        generateTable(startDate, endDate, count);
+        // generateTable(startDate, endDate, count);
     </script>
 @endsection

@@ -1,5 +1,42 @@
+const { forEach } = require("lodash");
+
+function getClender(id) {
+    $.get('/getClender/' + id, function (data) {
+        console.log(data.sub_activities);
+        var table = document.createElement("table");
+        var thead = document.createElement("thead");
+        var tbody = document.createElement("tbody");
+        thead.setAttribute("id", 'tableThead');
+        var trMonths = document.createElement("tr");
+        var trWeeks = document.createElement("tr");
+        var thWeeks1 = document.createElement("th");
+        var thWeeks2 = document.createElement("th");
+        var thWeeks3 = document.createElement("th");
+        var thMonths = document.createElement("th");
+        thMonths.colSpan = 15;
+        thWeeks1.colSpan = 5;
+        thWeeks2.colSpan = 5;
+        thWeeks3.colSpan = 5;
+        thWeeks1.innerText = "weeks";
+        trMonths.append(thMonths);
+        trWeeks.append(thWeeks1);
+        trWeeks.append(thWeeks2);
+        trWeeks.append(thWeeks3);
+        thead.append(trMonths);
+        thead.append(trWeeks);
+        tbody.setAttribute("id", "tableTbody");
 
 
+
+
+
+        var tableContainer = document.querySelector("#table-container");
+        tableContainer.innerHTML = "";
+        table.append(thead);
+        table.append(tbody);
+        tableContainer.append(table);
+    });
+}
 
 function generateTable(startDate, endDate, SubActivity) {
     var table = document.querySelector("#table");

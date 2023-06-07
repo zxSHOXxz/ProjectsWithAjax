@@ -23,14 +23,24 @@ class ProjectController extends Controller
         $sub_activities = SubActivity::all();
         return view('cms.projects.index', compact('projects', 'activities', 'sub_activities'));
     }
-    public function indexClender(Request $request)
+    public function indexClender()
     {
         $projects = Project::all();
-        $activities = Activity::with('sub_activities')->get();
-        return view('cms.clender.index', compact('projects', 'activities'));
+        return view('cms.clender.index', compact('projects'));
     }
 
-
+    public function getClender($id)
+    {
+        $projects = Project::where('id', $id)->first();
+        $activities = Activity::with('sub_activities')->where('project_id', $projects->id)->get();
+        $sub_activities = [];
+        foreach ($activities as  $activity) {
+            foreach ($activity->sub_activities  as $sub_activity) {
+                array_push($sub_activities, $sub_activity);
+            }
+        }
+        return response()->json(['project' => $projects, 'activities' => $activities, 'sub_activities' => $sub_activities]);
+    }
 
     public function getProjects()
     {
