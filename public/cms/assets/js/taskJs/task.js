@@ -1,12 +1,10 @@
-const { forEach } = require("lodash");
-
-function getClender(id) {
-    $.get('/getClender/' + id, function (data) {
-        console.log(data.sub_activities);
+function getClender(id, start, end) {
+    $.get("/getClender/" + id, function (data) {
         var table = document.createElement("table");
         var thead = document.createElement("thead");
         var tbody = document.createElement("tbody");
-        thead.setAttribute("id", 'tableThead');
+        thead.setAttribute("id", "tableThead");
+        table.setAttribute("id", "table");
         var trMonths = document.createElement("tr");
         var trWeeks = document.createElement("tr");
         var thWeeks1 = document.createElement("th");
@@ -19,22 +17,59 @@ function getClender(id) {
         thWeeks3.colSpan = 5;
         thWeeks1.innerText = "weeks";
         trMonths.append(thMonths);
+        trMonths.setAttribute("id", "monthsTr");
+        trWeeks.setAttribute("id", "weeksTr");
         trWeeks.append(thWeeks1);
         trWeeks.append(thWeeks2);
         trWeeks.append(thWeeks3);
         thead.append(trMonths);
         thead.append(trWeeks);
         tbody.setAttribute("id", "tableTbody");
-
-
-
-
+        var sub_activities = data.sub_activities;
+        var count = 0;
+        sub_activities.forEach((element) => {
+            var trPlanned = document.createElement("tr");
+            var trActual = document.createElement("tr");
+            var tdActual = document.createElement("td");
+            var tdPlanned = document.createElement("td");
+            if (count == 0) {
+                var tdActivities = document.createElement("td");
+                var activities = data.activities;
+                tdActivities.rowSpan = sub_activities.length * 2;
+                activities.forEach((element) => {
+                    var p = document.createElement("p");
+                    p.innerText = element.title;
+                    tdActivities.appendChild(p);
+                    tdActivities.colSpan = 5;
+                });
+                trPlanned.append(tdActivities);
+                count++;
+            }
+            tdPlanned.setAttribute("class", "planned");
+            tdActual.setAttribute("class", "planned");
+            tdActual.colSpan = 5;
+            tdPlanned.colSpan = 5;
+            tdActual.innerText = " Actual ";
+            tdPlanned.innerText = " Planned ";
+            var tdSubActivity = document.createElement("td");
+            tdSubActivity.append(element.title);
+            tdSubActivity.colSpan = 5;
+            tdSubActivity.rowSpan = 2;
+            trPlanned.append(tdSubActivity);
+            trPlanned.append(tdPlanned);
+            trActual.append(tdActual);
+            tbody.append(trPlanned);
+            tbody.append(trActual);
+        });
 
         var tableContainer = document.querySelector("#table-container");
         tableContainer.innerHTML = "";
         table.append(thead);
         table.append(tbody);
         tableContainer.append(table);
+        var startDate = new Date(start);
+        var endDate = new Date(end);
+        generateTable(startDate, endDate, sub_activities.length);
     });
 }
 
@@ -46,6 +81,7 @@ function generateTable(startDate, endDate, SubActivity) {
         startDate.getFullYear(),
         endDate.getFullYear()
     );
+
     var trMonths = document.querySelector("#monthsTr");
     var trWeeks = document.querySelector("#weeksTr");
 
@@ -61,24 +97,21 @@ function generateTable(startDate, endDate, SubActivity) {
 
             for (let index = 1; index <= weeks; index++) {
                 var thWeek = document.createElement("th");
-                thWeek.setAttribute("id", 'thOfweek');
+                thWeek.setAttribute("id", "thOfweek");
                 thWeek.innerText = `W ${index}`;
                 trWeeks.append(thWeek);
             }
         });
-
-        var numberOfthWeek = document.querySelectorAll('#thOfweek');
-
-        subActivityTrNumber.forEach(element => {
+        var subActivityTrNumber = document.querySelectorAll("td.planned");
+        var numberOfthWeek = document.querySelectorAll("#thOfweek");
+        subActivityTrNumber.forEach((element) => {
             for (let index = 0; index < numberOfthWeek.length; index++) {
                 var tdWeek = document.createElement("td");
-                var trSS = element.closest('tr');
+                var trSS = element.closest("tr");
                 trSS.append(tdWeek);
             }
         });
     }
-
-
 
     thead.append(trMonths);
     thead.append(trWeeks);
@@ -104,7 +137,8 @@ function getWeeksPerMonth(startYear, endYear) {
         "November",
         "December",
     ];
-
+    var startDate = new Date(document.querySelector("#start_date").value);
+    var endDate = new Date(document.querySelector("#end_date").value);
     for (let year = startYear; year <= endYear; year++) {
         const startMonth = year === startYear ? startDate.getMonth() : 0;
         const endMonth = year === endYear ? endDate.getMonth() : 11;

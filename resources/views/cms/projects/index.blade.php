@@ -674,7 +674,7 @@
     <script src="{{ asset('cms/assets/demo/pages/form_select2.js') }}"></script>
     <script src="{{ asset('cms/assets/js/taskJs/getData.js') }}"></script>
     <script src="{{ asset('cms/assets/js/taskJs/storeData.js') }}"></script>
-    <script src="{{ asset('cms/assets/js/taskJs/update,js') }}"></script>
+    <script src="{{ asset('cms/assets/js/taskJs/update.js') }}"></script>
     <script src="{{ asset('cms/assets/js/taskJs/inners.js') }}"></script>
     <script src="{{ asset('cms/assets/js/taskJs/events.js') }}"></script>
 @endsection

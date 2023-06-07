@@ -62,33 +62,7 @@
         </form>
     </div>
     <div id="table-container">
-        {{-- <table id="table">
-            <thead id="tableThead">
-                <tr id="monthsTr">
-                    <th colspan="15"> </th>
-                </tr>
-                <tr id="weeksTr">
-                    <th colspan="15"> weeks </th>
-                </tr>
-            </thead>
-            <tbody id="tableTbody">
-                @foreach ($activitiesT as $activity)
-                    @php
-                        $sub_activity_new = App\Models\SubActivity::where('activity_id', $activity->id)->get();
-                    @endphp
-                    @foreach ($sub_activity_new as $sub_activity)
-                        <tr>
-                            <td colspan="5" rowspan="2" class="tdActivity">{{ $activity->title }}</td>
-                            <td colspan="5" rowspan="2">{{ $sub_activity->title }}</td>
-                            <td colspan="5" class="planned"> planned </td>
-                        </tr>
-                        <tr>
-                            <td colspan="5" class="planned"> actual </td>
-                        </tr>
-                    @endforeach
-                @endforeach
-            </tbody>
-        </table> --}}
+
     </div>
 @endsection
 
@@ -108,17 +82,13 @@
 @section('scripts')
     <script src="{{ asset('cms/assets/js/taskJs/task.js') }}"></script>
     <script>
-        var startDate = new Date("2023-01-01");
-        var endDate = new Date();
-        var subActivityTrNumber = document.querySelectorAll('td.planned');
-        var count = subActivityTrNumber.length
+
 
         function filter() {
             var project_id = document.querySelector("#project_id").value
-            var tableStart_date = document.querySelector("#start_date").value
-            var tableEnd_date = document.querySelector("#end_date").value
-            getClender(project_id);
+            var startDate = document.querySelector("#start_date").value
+            var endDate = document.querySelector("#end_date").value
+            getClender(project_id, startDate, endDate);
         }
-        // generateTable(startDate, endDate, count);
     </script>
 @endsection
