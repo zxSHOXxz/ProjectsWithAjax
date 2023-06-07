@@ -2,7 +2,6 @@ function store(url, data) {
     axios
         .post(url, data)
         .then(function (response) {
-            console.log(response.data);
             showMessage(response.data);
             clearForm();
             clearAndHideErrors();

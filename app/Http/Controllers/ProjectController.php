@@ -20,14 +20,17 @@ class ProjectController extends Controller
     {
         $projects = Project::all();
         $activities = Activity::all();
-        return view('cms.projects.index', compact('projects', 'activities'));
+        $sub_activities = SubActivity::all();
+        return view('cms.projects.index', compact('projects', 'activities', 'sub_activities'));
     }
-    public function indexClender()
+    public function indexClender(Request $request)
     {
         $projects = Project::all();
-        $activities = Activity::all();
+        $activities = Activity::with('sub_activities')->get();
         return view('cms.clender.index', compact('projects', 'activities'));
     }
+
+
 
     public function getProjects()
     {

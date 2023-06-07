@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class SubActivity extends Model
 {
     use HasFactory;
+
+    public function activities()
+    {
+        return $this->belongsTo(Activity::class);
+    }
 }
