@@ -82,13 +82,11 @@
 @section('scripts')
     <script src="{{ asset('cms/assets/js/taskJs/task.js') }}"></script>
     <script>
-
-
         function filter() {
             var project_id = document.querySelector("#project_id").value
-            var startDate = document.querySelector("#start_date").value
-            var endDate = document.querySelector("#end_date").value
-            getClender(project_id, startDate, endDate);
+            var startDateInput = document.querySelector("#start_date").value
+            var endDateInput = document.querySelector("#end_date").value
+            getClender(project_id, startDateInput, endDateInput);
         }
     </script>
 @endsection

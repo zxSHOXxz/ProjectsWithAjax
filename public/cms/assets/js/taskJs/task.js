@@ -61,15 +61,14 @@ function getClender(id, start, end) {
             tbody.append(trPlanned);
             tbody.append(trActual);
         });
-
         var tableContainer = document.querySelector("#table-container");
         tableContainer.innerHTML = "";
         table.append(thead);
         table.append(tbody);
         tableContainer.append(table);
-        var startDate = new Date(start);
-        var endDate = new Date(end);
-        generateTable(startDate, endDate, sub_activities.length);
+        var startDateE = start;
+        var endDateE = end;
+        generateTable(startDateE, endDateE, sub_activities.length);
     });
 }
 
@@ -77,22 +76,19 @@ function generateTable(startDate, endDate, SubActivity) {
     var table = document.querySelector("#table");
     var thead = document.querySelector("#tableThead");
     var tbody = document.querySelector("#tableTbody");
-    var weeksPerMonth = getWeeksPerMonth(
-        startDate.getFullYear(),
-        endDate.getFullYear()
-    );
+    var weeksByMonth = calculateWeeksByMonth(startDate, endDate);
 
     var trMonths = document.querySelector("#monthsTr");
     var trWeeks = document.querySelector("#weeksTr");
 
     addMonthsToTable();
     function addMonthsToTable() {
-        weeksPerMonth.forEach((element) => {
+        weeksByMonth.forEach((element) => {
             var th = document.createElement("th");
             var weeks = element.weeks;
 
             th.colSpan = weeks;
-            th.innerText = `${element.month} ${startDate.getFullYear()}`;
+            th.innerText = `${element.month} ${element.year}`;
             trMonths.append(th);
 
             for (let index = 1; index <= weeks; index++) {
@@ -121,41 +117,29 @@ function generateTable(startDate, endDate, SubActivity) {
     tableContainer.append(table);
 }
 
-function getWeeksPerMonth(startYear, endYear) {
-    const weeksPerMonth = [];
-    const months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
-    var startDate = new Date(document.querySelector("#start_date").value);
-    var endDate = new Date(document.querySelector("#end_date").value);
-    for (let year = startYear; year <= endYear; year++) {
-        const startMonth = year === startYear ? startDate.getMonth() : 0;
-        const endMonth = year === endYear ? endDate.getMonth() : 11;
+function calculateWeeksByMonth(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-        for (let i = startMonth; i <= endMonth; i++) {
-            const month = months[i];
-            const firstDay = new Date(year, i, 1);
-            const lastDay = new Date(year, i + 1, 0);
-            const daysInMonth = lastDay.getDate() - firstDay.getDate() + 1;
-            const firstDayOfWeek = (firstDay.getDay() + 6) % 7;
-            const offset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
-            const weeksInMonth = Math.ceil((daysInMonth + offset) / 7);
-            weeksPerMonth.push({
-                month,
-                weeks: weeksInMonth,
-            });
-        }
+    const startYear = start.getFullYear();
+    const startMonth = start.getMonth();
+    const endYear = end.getFullYear();
+    const endMonth = end.getMonth();
+
+    const diffMonths = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
+
+    const weeksByMonth = [];
+    for (let i = 0; i < diffMonths; i++) {
+        const currentMonth = new Date(startYear, startMonth + i, 1);
+        const nextMonth = new Date(startYear, startMonth + i + 1, 0);
+        const diffTime = Math.abs(nextMonth - currentMonth);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const weeks = Math.floor(diffDays / 7);
+
+        const month = currentMonth.toLocaleString("en-US", { month: "long" });
+        const year = currentMonth.getFullYear();
+        weeksByMonth.push({ month, year, weeks });
     }
-    return weeksPerMonth;
+
+    return weeksByMonth;
 }
