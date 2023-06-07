@@ -131,10 +131,11 @@ function calculateWeeksByMonth(startDate, endDate) {
     const weeksByMonth = [];
     for (let i = 0; i < diffMonths; i++) {
         const currentMonth = new Date(startYear, startMonth + i, 1);
-        const nextMonth = new Date(startYear, startMonth + i + 1, 0);
+        const nextMonth = new Date(startYear, startMonth + i + 1, 1);
         const diffTime = Math.abs(nextMonth - currentMonth);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        const weeks = Math.floor(diffDays / 7);
+
+        let weeks = Math.ceil(diffDays / 7);
 
         const month = currentMonth.toLocaleString("en-US", { month: "long" });
         const year = currentMonth.getFullYear();
