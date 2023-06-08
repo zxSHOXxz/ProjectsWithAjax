@@ -67,13 +67,7 @@
 @endsection
 
 
-{{-- @php
 
-@endphp --}}
-{{-- @foreach ($activities as $activity) --}}
-
-
-{{-- @endforeach --}}
 
 
 

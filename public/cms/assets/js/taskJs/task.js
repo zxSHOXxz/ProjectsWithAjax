@@ -66,8 +66,24 @@ function getClender(id, start, end) {
         table.append(thead);
         table.append(tbody);
         tableContainer.append(table);
-        var startDateE = start;
-        var endDateE = end;
+        if (end >= data.project.end) {
+            var startDateE = data.project.start;
+            var endDateE = data.project.end;
+            var startDateInput = document.querySelector("#start_date")
+            var endDateInput = document.querySelector("#end_date")
+            startDateInput.value = startDateE
+            endDateInput.value = endDateE
+        } else if (start <= data.project.start) {
+            var startDateE = data.project.start;
+            var endDateE = data.project.end;
+            var startDateInput = document.querySelector("#start_date")
+            var endDateInput = document.querySelector("#end_date")
+            startDateInput.value = startDateE
+            endDateInput.value = endDateE
+        } else {
+            var startDateE = start;
+            var endDateE = end;
+        }
         generateTable(startDateE, endDateE, sub_activities.length);
     });
 }
@@ -103,6 +119,7 @@ function generateTable(startDate, endDate, SubActivity) {
         subActivityTrNumber.forEach((element) => {
             for (let index = 0; index < numberOfthWeek.length; index++) {
                 var tdWeek = document.createElement("td");
+                tdWeek.setAttribute("onclick", "makeTrue(this)");
                 var trSS = element.closest("tr");
                 trSS.append(tdWeek);
             }
@@ -143,4 +160,7 @@ function calculateWeeksByMonth(startDate, endDate) {
     }
 
     return weeksByMonth;
+}
+function makeTrue(referance) {
+    referance.innerHTML = `<i class="fa-solid fa-check"></i>`
 }
